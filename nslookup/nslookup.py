@@ -14,6 +14,10 @@ class DNSresponse:
         self.answer = answer
 
 
+    def __str__(self):
+        return self.__dict__
+
+
 class Nslookup:
     """Object for initializing DNS resolver, with optional specific DNS servers"""
     def __init__(self, dns_servers=[], verbose=True, tcp=False):
