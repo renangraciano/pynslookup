@@ -85,9 +85,10 @@ For large number of requests or iterative requests, it may be better to use the 
 
 
     def soa_lookup(self, domain):
-        soa_answer = self.base_lookup(domain, "SOA")
+        # raise_on_no_answer=False allows for returning records that are in Authority field
+        soa_answer = self.base_lookup(domain, "SOA", raise_on_no_answer=False)
         if soa_answer:
-            soa_response = [answer.to_text() for answer in soa_answer.response.answer]
-            soa = [next(answer.__iter__()).to_text() for answer in soa_answer.response.answer]
+            soa_response = [answer.to_text() for answer in soa_answer.response.answer] + [item.to_text() for item in soa_answer.response.authority]
+            soa = [next(answer.__iter__()).to_text() for answer in soa_answer.response.answer] + [next(item.__iter__()).to_text() for item in soa_answer.response.authority]
             return DNSresponse(soa_response, soa)
         return DNSresponse()
