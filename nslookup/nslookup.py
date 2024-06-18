@@ -33,10 +33,10 @@ For large number of requests or iterative requests, it may be better to use the 
             self.dns_resolver.nameservers = dns_servers
 
 
-    def base_lookup(self, domain, record_type):
+    def base_lookup(self, domain, record_type, **kwargs):
         """Get the DNS record for the given domain and type, handling errors"""
         try:
-            answer = self.dns_resolver.resolve(domain, rdtype=record_type, tcp=self.tcp)
+            answer = self.dns_resolver.resolve(domain, rdtype=record_type, tcp=self.tcp, **kwargs)
             return answer
         except dns.resolver.NXDOMAIN:
             # the domain does not exist so dns resolutions remain empty
@@ -51,6 +51,8 @@ For large number of requests or iterative requests, it may be better to use the 
         except dns.exception.DNSException as e:
             if self.verbose:
                 print("Error: DNS exception occurred looking up '{}':".format(domain), e, file=sys.stderr)
+        except TypeError:
+            print("You likely specified an invalid argument to dnspython")
 
 
     def dns_host_lookup(self, domain, record_type, include_cname=False):
