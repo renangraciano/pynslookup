@@ -15,7 +15,7 @@ class DNSresponse:
 
 
     def __str__(self):
-        return self.__dict__
+        return str(self.__dict__)
 
 
 class Nslookup:
