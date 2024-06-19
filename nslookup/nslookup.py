@@ -86,12 +86,17 @@ For large number of requests or iterative requests, it may be better to use the 
 
     def soa_lookup(self, domain):
         # raise_on_no_answer=False allows for returning records that are in Authority field
-        soa_answer = self.base_lookup(domain, "SOA", raise_on_no_answer=False)
+        response = self.base_lookup(domain, "SOA", raise_on_no_answer=False)
         
         # cannot reliably use `if [dns.resolver.Answer instance]`
         # comparison is done on rrset, which is None if there is no answer
-        if isinstance(soa_answer, dns.resolver.Answer):
-            soa_response = [answer.to_text() for answer in soa_answer.response.answer] + [item.to_text() for item in soa_answer.response.authority]
-            soa = [next(answer.__iter__()).to_text() for answer in soa_answer.response.answer] + [next(item.__iter__()).to_text() for item in soa_answer.response.authority]
-            return DNSresponse(soa_response, soa)
+        if isinstance(response, dns.resolver.Answer):
+            soa_response = [answer.to_text() for answer in response.response.answer] + [item.to_text() for item in response.response.authority]
+            soa_answer = [next(answer.__iter__()).to_text() for answer in response.response.answer]
+
+            # if SOA in authority section, add authority item to instance
+            resp_obj = DNSresponse(soa_response, soa_answer)
+            if response.response.authority:
+                resp_obj.authority = [next(item.__iter__()).to_text() for item in response.response.authority]
+            return resp_obj
         return DNSresponse()
